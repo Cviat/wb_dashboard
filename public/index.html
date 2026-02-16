@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WB Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Сайдбар -->
+    <aside class="sidebar">
+        <div class="sidebar__logo">
+            <span class="sidebar__logo-icon">&#9670;</span>
+            <span class="sidebar__logo-text">WB Dashboard</span>
+        </div>
+        <nav class="sidebar__nav">
+            <a href="#" class="sidebar__item active" data-section="reviews">
+                <span class="sidebar__icon">&#9733;</span>
+                <span>Отзывы</span>
+            </a>
+            <a href="#" class="sidebar__item" data-section="chats">
+                <span class="sidebar__icon">&#9993;</span>
+                <span>Чаты с покупателями</span>
+            </a>
+            <a href="#" class="sidebar__item" data-section="support">
+                <span class="sidebar__icon">&#9881;</span>
+                <span>Техподдержка</span>
+            </a>
+        </nav>
+
+    </aside>
+
+    <!-- Основной контент -->
+    <main class="main">
+
+        <!-- Приветственная панель -->
+        <div class="welcome-bar" id="welcomeBar">
+            <div class="welcome-bar__text">
+                <strong>WB Dashboard</strong> —  Локальный веб-интерфейс для взаимодействия с данными WildBerries через API  
+            </div>
+        </div>
+
+        <!-- ═══ ОТЗЫВЫ ═══ -->
+        <section class="section" id="section-reviews">
+            <div class="section__header">
+                <h1 class="section__title">Отзывы</h1>
+                <div class="section__counters" id="reviewCounters"></div>
+            </div>
+
+            <div class="filters">
+                <div class="filters__group">
+                    <button class="filter-btn active" data-filter="all">Все</button>
+                    <button class="filter-btn" data-filter="unanswered">Без ответа</button>
+                    <button class="filter-btn" data-filter="answered">С ответом</button>
+                </div>
+                <div class="filters__group">
+                    <select class="filter-select" id="ratingFilter">
+                        <option value="">Любая оценка</option>
+                        <option value="5">&#9733; 5</option>
+                        <option value="4">&#9733; 4</option>
+                        <option value="3">&#9733; 3</option>
+                        <option value="2">&#9733; 2</option>
+                        <option value="1">&#9733; 1</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="reviews-list" id="reviewsList">
+                <div class="loader" id="reviewsLoader">Загрузка отзывов...</div>
+            </div>
+
+            <div class="pagination" id="reviewsPagination"></div>
+        </section>
+
+        <!-- ═══ ЧАТЫ С ПОКУПАТЕЛЯМИ ═══ -->
+        <section class="section hidden" id="section-chats">
+            <div class="section__header">
+                <h1 class="section__title">Чаты с покупателями</h1>
+            </div>
+
+            <div class="chat-filters">
+                <div class="filters__group">
+                    <label class="filter-label">С:</label>
+                    <input type="date" class="filter-date" id="chatDateFrom">
+                    <label class="filter-label">По:</label>
+                    <input type="date" class="filter-date" id="chatDateTo">
+                    <button class="btn btn--primary btn--sm" id="chatDateApply">Применить</button>
+                    <button class="btn btn--secondary btn--sm" id="chatDateReset">Сбросить</button>
+                </div>
+            </div>
+
+            <div class="chat-layout">
+                <div class="chat-list" id="chatList">
+                    <div class="chat-list__header">
+                        <input type="text" class="chat-search" placeholder="Поиск чата..." id="chatSearch">
+                    </div>
+                    <div class="chat-list__items" id="chatListItems">
+                        <div class="loader">Загрузка чатов...</div>
+                    </div>
+                </div>
+
+                <div class="chat-window" id="chatWindow">
+                    <div class="chat-window__empty">
+                        <span class="chat-window__empty-icon">&#9993;</span>
+                        <p>Выберите чат для просмотра сообщений</p>
+                    </div>
+                    <div class="chat-window__header hidden" id="chatWindowHeader">
+                        <div class="chat-window__user" id="chatWindowUser"></div>
+                    </div>
+                    <div class="chat-window__messages hidden" id="chatMessages"></div>
+                    <div class="chat-window__input hidden" id="chatInput">
+                        <textarea class="chat-textarea" id="chatTextarea" placeholder="Введите сообщение..." rows="1"></textarea>
+                        <button class="chat-send-btn" id="chatSendBtn">&#10148;</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ ТЕХПОДДЕРЖКА ═══ -->
+        <section class="section hidden" id="section-support">
+            <div class="section__header">
+                <h1 class="section__title">Вопросы покупателей</h1>
+                <div class="section__counters" id="supportCounters"></div>
+            </div>
+
+            <div class="filters">
+                <div class="filters__group">
+                    <button class="filter-btn active" data-filter-support="all">Все</button>
+                    <button class="filter-btn" data-filter-support="unanswered">Без ответа</button>
+                    <button class="filter-btn" data-filter-support="answered">С ответом</button>
+                </div>
+                <div class="filters__group">
+                    <select class="filter-select" id="supportStatusFilter">
+                        <option value="">Любой статус</option>
+                        <option value="open">Открыто</option>
+                        <option value="in-progress">В работе</option>
+                        <option value="resolved">Решено</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="support-list" id="supportList">
+                <div class="loader" id="supportLoader">Загрузка вопросов...</div>
+            </div>
+
+            <div class="pagination" id="supportPagination"></div>
+        </section>
+
+    </main>
+
+    <script src="/js/reviews.js"></script>
+    <script src="/js/chats.js"></script>
+    <script src="/js/support.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
