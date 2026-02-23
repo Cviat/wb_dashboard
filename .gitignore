@@ -6,3 +6,9 @@ uploads/*
 .DS_Store
 temp_archive/
 *.zip
+
+# Локальные скрипты деплоя (не для GitHub)
+deploy.ps1
+install.sh
+deploy.md
+GITHUB_ACTIONS.md
