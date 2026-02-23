@@ -81,6 +81,7 @@ const Chats = (() => {
     // Загрузка событий с пагинацией (с задержками чтобы не попасть в 429)
     let eventsLoaded = false;
     let eventsNextCursor = null;
+    let totalEventsCount = 0;
 
     const loadEvents = async () => {
         if (eventsLoaded) return;
@@ -98,6 +99,10 @@ const Chats = (() => {
 
             const events = data.events || [];
             allEvents.push(...events);
+            totalEventsCount = data.totalEvents || 0;
+
+            // Обновляем открытый чат новыми данными
+            updateOpenChat();
 
             if (data.totalEvents > 0 && data.next) {
                 eventsNextCursor = data.next;
@@ -105,9 +110,42 @@ const Chats = (() => {
                 setTimeout(() => loadEvents(), 1500);
             } else {
                 eventsLoaded = true;
+                updateOpenChat(); // финальное обновление без индикатора
             }
         } catch (e) {
             console.warn('Events load failed:', e.message);
+        }
+    };
+
+    // Обновление открытого чата с новыми событиями
+    const updateOpenChat = () => {
+        if (!activeChatId) return;
+
+        const chatMessages = allEvents
+            .filter(ev => ev.chatID === activeChatId || ev.chatId === activeChatId)
+            .sort((a, b) => (a.addTimestamp || 0) - (b.addTimestamp || 0));
+
+        renderMessages(chatMessages);
+
+        // Показываем статус загрузки внизу чата
+        if (!eventsLoaded) {
+            const container = document.getElementById('chatMessages');
+            if (container && !document.getElementById('chatLoadingStatus')) {
+                const statusDiv = document.createElement('div');
+                statusDiv.id = 'chatLoadingStatus';
+                statusDiv.style.cssText = 'text-align:center;padding:10px;opacity:0.7;font-size:12px;';
+                statusDiv.innerHTML = `📥 Загружается история... (${allEvents.length} событий)`;
+                container.appendChild(statusDiv);
+            } else if (container) {
+                const statusDiv = document.getElementById('chatLoadingStatus');
+                if (statusDiv) {
+                    statusDiv.innerHTML = `📥 Загружается история... (${allEvents.length} событий)`;
+                }
+            }
+        } else {
+            // Убираем индикатор когда закончили
+            const statusDiv = document.getElementById('chatLoadingStatus');
+            if (statusDiv) statusDiv.remove();
         }
     };
 
@@ -171,22 +209,31 @@ const Chats = (() => {
 
         document.getElementById('chatWindowUser').textContent = userName;
 
-        // Фильтруем события по chatID — это сообщения этого чата
+        // Фильтруем события по chatID — показываем что уже загружено
         const chatMessages = allEvents
             .filter(ev => ev.chatID === chatId || ev.chatId === chatId)
             .sort((a, b) => (a.addTimestamp || 0) - (b.addTimestamp || 0));
 
-        if (chatMessages.length === 0 && !eventsLoaded) {
+        if (chatMessages.length === 0 && allEvents.length === 0) {
+            // Ещё вообще ничего не загрузилось
             document.getElementById('chatMessages').innerHTML = 
-                '<div class="loader">Загрузка сообщений... (события подгружаются)</div>';
-            // Повторить через 2 сек когда события подгрузятся
-            setTimeout(() => {
-                if (activeChatId === chatId) openChat(chatId, userName);
-            }, 2000);
+                '<div class="loader">Загрузка сообщений...</div>';
             return;
         }
 
+        // Показываем что есть + индикатор загрузки если события ещё грузятся
         renderMessages(chatMessages);
+        
+        if (!eventsLoaded) {
+            const container = document.getElementById('chatMessages');
+            if (container && !document.getElementById('chatLoadingStatus')) {
+                const statusDiv = document.createElement('div');
+                statusDiv.id = 'chatLoadingStatus';
+                statusDiv.style.cssText = 'text-align:center;padding:10px;opacity:0.7;font-size:12px;';
+                statusDiv.innerHTML = `📥 Загружается история... (${allEvents.length} событий)`;
+                container.appendChild(statusDiv);
+            }
+        }
     };
 
     const renderMessages = (messages) => {
